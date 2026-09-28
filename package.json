@@ -1,0 +1,55 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "orca-worktrees",
+  "title": "Orca Worktrees",
+  "description": "Orca の worktree を一覧し、選んだものを Orca で開く",
+  "icon": "extension-icon.png",
+  "author": "charden",
+  "categories": ["Developer Tools"],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "search-worktrees",
+      "title": "Search Orca Worktrees",
+      "description": "worktree を最近触った順に一覧し、Orca で開く",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "query",
+          "type": "text",
+          "placeholder": "検索語（任意）",
+          "required": false
+        }
+      ]
+    }
+  ],
+  "preferences": [
+    {
+      "name": "orcaPath",
+      "title": "orca CLI のパス",
+      "description": "空なら ~/.local/bin, /opt/homebrew/bin, /usr/local/bin の順に探す",
+      "type": "textfield",
+      "required": false
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.100.0",
+    "@raycast/utils": "^1.19.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.0.0"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  }
+}
