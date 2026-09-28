@@ -41,6 +41,9 @@ export async function listAll(): Promise<{
 // 既存のターミナルがあればそこへ切り替え、なければ新しく作って表示する。
 // ハンドルが古くなっている（Orca 再起動後など）場合も、作り直しで開ける。
 export async function openInOrca(worktreeId: string, terminalHandles: string[]): Promise<"switched" | "created"> {
+  // キャッシュされた一覧からは Orca 未起動でも選べるので、先に起動して runtime に届くまで待つ。
+  // 起動済みなら数十 ms で返る。
+  await orca(["open"]);
   let result: "switched" | "created" = "created";
   const handle = terminalHandles[0];
   if (handle) {
