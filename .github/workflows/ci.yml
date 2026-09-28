@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # raycast-env.d.ts は ray が生成するため、tsc 単体ではなく ray build で型チェックする
+      - name: Build and typecheck
+        run: npx ray build -e dist
+      - run: npx vitest run
+      # ray lint は author を Raycast Store に照会して落ちるので、ESLint と Prettier を直接使う
+      - run: npx eslint src
+      - run: npx prettier --check .
