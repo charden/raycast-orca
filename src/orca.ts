@@ -4,6 +4,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { getPreferenceValues } from "@raycast/api";
+import { parseEnvelope } from "./envelope";
 import type { OrcaRepo, OrcaTerminal, OrcaWorktree } from "./model";
 
 const execFileAsync = promisify(execFile);
@@ -19,10 +20,19 @@ function orcaPath(): string {
 }
 
 async function orca<T>(args: string[]): Promise<T> {
-  const { stdout } = await execFileAsync(orcaPath(), [...args, "--json"], { maxBuffer: 32 * 1024 * 1024 });
-  const envelope = JSON.parse(stdout) as { ok: boolean; result: T; error?: { message?: string } };
-  if (!envelope.ok) throw new Error(envelope.error?.message ?? `orca ${args.join(" ")} が失敗しました`);
-  return envelope.result;
+  const command = args.join(" ");
+  let stdout: string;
+  try {
+    ({ stdout } = await execFileAsync(orcaPath(), [...args, "--json"], { maxBuffer: 32 * 1024 * 1024 }));
+  } catch (error) {
+    // exit 1 でも stdout にエンベロープがあれば、その理由を投げる。なければ元のエラーのまま。
+    const out = (error as { stdout?: string }).stdout;
+    if (out) parseEnvelope(out, command);
+    throw error;
+  }
+  const parsed = parseEnvelope<T>(stdout, command);
+  if (!parsed) throw new Error(`orca ${command} の出力を JSON として読めませんでした`);
+  return parsed.result;
 }
 
 export async function listAll(): Promise<{
