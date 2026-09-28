@@ -30,12 +30,35 @@ export async function listAll(): Promise<{
   repos: OrcaRepo[];
   terminals: OrcaTerminal[];
 }> {
+  await launchInBackground();
   const [wt, repo, term] = await Promise.all([
     orca<{ worktrees: OrcaWorktree[] }>(["worktree", "list"]),
     orca<{ repos: OrcaRepo[] }>(["repo", "list"]),
     orca<{ terminals: OrcaTerminal[] }>(["terminal", "list"]),
   ]);
   return { worktrees: wt.worktrees, repos: repo.repos, terminals: term.terminals };
+}
+
+// Orca 未起動だと list 系は失敗する。orca open は Orca を前面に出して Raycast を閉じてしまうので、
+// 一覧を出す段階では open -g で裏で起動し、runtime に届くまで待つ。
+async function launchInBackground(): Promise<void> {
+  if (await isReachable()) return;
+  await execFileAsync("/usr/bin/open", ["-g", "-a", "Orca"]);
+  const deadline = Date.now() + 20_000;
+  while (Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    if (await isReachable()) return;
+  }
+  throw new Error("Orca の起動を待ちましたが、20 秒以内に応答がありませんでした");
+}
+
+async function isReachable(): Promise<boolean> {
+  try {
+    const status = await orca<{ runtime?: { reachable?: boolean } }>(["status"]);
+    return status.runtime?.reachable === true;
+  } catch {
+    return false;
+  }
 }
 
 // 既存のターミナルがあればそこへ切り替え、なければ新しく作って表示する。
