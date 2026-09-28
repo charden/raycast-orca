@@ -67,7 +67,8 @@ export function toWorktreeItems(
       const comment = wt.comment ?? "";
       const links = buildLinks(wt);
       const own = terminals.filter((t) => t.worktreeId === wt.id);
-      const agents = own.filter((t) => t.agentIdentity);
+      // 同じ worktree に前回の orphaned なエージェントが残っていても、今動いている方を先に開く
+      const agents = own.filter((t) => t.agentIdentity).sort((a, b) => Number(a.orphaned) - Number(b.orphaned));
       const others = own.filter((t) => !t.agentIdentity);
       return {
         id: wt.id,

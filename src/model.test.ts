@@ -65,6 +65,18 @@ describe("toWorktreeItems", () => {
     expect(item.agentCount).toBe(1);
   });
 
+  // 前回の orphaned なエージェントより、今動いているエージェントを Enter で開きたい
+  it("エージェント同士では orphaned でないタブを先にする", () => {
+    const barb = "r1::/home/me/orca/workspaces/dotfiles/barb";
+    const terminals: OrcaTerminal[] = [
+      { handle: "shell", worktreeId: barb, orphaned: false, agentIdentity: null },
+      { handle: "stale", worktreeId: barb, orphaned: true, agentIdentity: "claude" },
+      { handle: "live", worktreeId: barb, orphaned: false, agentIdentity: "claude" },
+    ];
+    const [item] = toWorktreeItems([worktree({})], repos, terminals);
+    expect(item.terminalHandles).toEqual(["live", "stale", "shell"]);
+  });
+
   it("GitHub の issue・PR と Linear のリンクを作る", () => {
     const [item] = toWorktreeItems(
       [
