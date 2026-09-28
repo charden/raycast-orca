@@ -1,6 +1,6 @@
 # Orca Worktrees
 
-[Orca](https://github.com/stablyai/orca) で管理している worktree を Raycast から検索して、Orca で開くための拡張です。
+[Orca](https://github.com/stablyai/orca) で管理している worktree を Raycast から検索して、Orca で開くための拡張です。Orca 公式の拡張ではありません。
 
 [![CI](https://github.com/charden/raycast-orca/actions/workflows/ci.yml/badge.svg)](https://github.com/charden/raycast-orca/actions/workflows/ci.yml)
 
@@ -75,6 +75,11 @@ CLI が失敗したときは、stdout に出る JSON のエラー理由をトー
 
 CI（GitHub Actions）では、ビルドと型チェック、テスト、ESLint、Prettier を実行します。
 
+## アイコン
+
+- 拡張のアイコン（`assets/extension-icon.png`）は、この拡張のために作ったものです。元の SVG は `assets/extension-icon.svg` にあります。
+- 「Open in Orca」アクションには、インストール済みの Orca（`/Applications/Orca.app`）のアイコンを表示します。Orca のロゴはリポジトリに同梱していません。Orca が見つからないときは Raycast の標準アイコンを使います。
+
 ## ライセンス
 
-MIT
+[MIT](LICENSE)

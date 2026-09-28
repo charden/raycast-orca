@@ -3,6 +3,7 @@ import {
   ActionPanel,
   Color,
   Icon,
+  Image,
   Keyboard,
   LaunchProps,
   List,
@@ -11,9 +12,14 @@ import {
   showToast,
 } from "@raycast/api";
 import { showFailureToast, useCachedPromise } from "@raycast/utils";
+import { existsSync } from "node:fs";
 import { useMemo, useState } from "react";
 import { toWorktreeItems, type WorktreeItem } from "./model";
 import { listAll, openInOrca } from "./orca";
+
+// Orca のアイコンは同梱せず、インストール済みのアプリから表示する。見つからなければ標準のアイコンにする。
+const ORCA_APP = "/Applications/Orca.app";
+const orcaIcon: Image.ImageLike = existsSync(ORCA_APP) ? { fileIcon: ORCA_APP } : Icon.AppWindow;
 
 const STATUS: Record<string, { label: string; color: Color }> = {
   todo: { label: "Todo", color: Color.SecondaryText },
@@ -82,7 +88,7 @@ function WorktreeRow({ item, onRefresh }: { item: WorktreeItem; onRefresh: () =>
       accessories={accessories}
       actions={
         <ActionPanel>
-          <Action title="Open in Orca" icon={Icon.AppWindow} onAction={() => open(item)} />
+          <Action title="Open in Orca" icon={orcaIcon} onAction={() => open(item)} />
           {item.links.map((link) => (
             <Action.OpenInBrowser key={link.url} title={`Open ${link.label}`} url={link.url} />
           ))}
